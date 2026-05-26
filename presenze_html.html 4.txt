@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Presenze</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Presenze"/>
+<meta name="theme-color" content="#E74C3C"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;background:#f2f2f7;min-height:100vh;max-width:430px;margin:0 auto}
+button{font-family:inherit;cursor:pointer}
+#header{background:#fff;border-bottom:1px solid #e5e5ea;padding:52px 16px 14px}
+#header-label{font-size:11px;color:#8e8e93;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
+#month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+#month-nav button{background:#f2f2f7;border:none;border-radius:8px;width:34px;height:34px;font-size:20px;color:#1c1c1e;display:flex;align-items:center;justify-content:center}
+#month-title{font-size:18px;font-weight:500;color:#1c1c1e}
+#stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:#f
