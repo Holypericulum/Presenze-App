@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Presenze</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Presenze"/>
+<meta name="theme-color" content="#E74C3C"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;background:#f2f2f7;min-height:100vh;max-width:430px;margin:0 auto}
+button{font-family:inherit;cursor:pointer}
+#header{background:#fff;border-bottom:1px solid #e5e5ea;padding:52px 16px 14px}
+#header-label{font-size:11px;color:#8e8e93;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
+#month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+#month-nav button{background:#f2f2f7;border:none;border-radius:8px;width:34px;height:34px;font-size:20px;color:#1c1c1e;display:flex;align-items:center;justify-content:center}
+#month-title{font-size:18px;font-weight:500;color:#1c1c1e}
+#stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:#f2f2f7;border-radius:10px;padding:8px 10px;text-align:center}
+.stat-label{font-size:11px;color:#8e8e93;margin-bottom:2px}
+.stat-val{font-size:20px;font-weight:500;color:#E74C3C}
+#cal-wrap{background:#fff;margin:12px;border-radius:14px;padding:12px 8px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+#day-headers{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
+.dh{text-align:center;font-size:11px;font-weight:500;color:#8e8e93;padding:4px 0}
+#cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:opacity .1s}
+.cell-num{font-size:14px;font-weight:400;line-height:1}
+.cell-ore{font-size:9px;line-height:1;margin-top:2px}
+.cell-today{border:1.5px solid #E74C3C !important}
+.cell-today .cell-num{color:#E74C3C;font-weight:500}
+.cell-eff{background:#C0392B;border-color:#922B21 !important}
+.cell-eff .cell-num{color:#fff}
+.cell-eff .cell-ore{color:rgba(255,255,255,.8)}
+.cell-pia{background:rgba(230,126,34,.15);border-color:rgba(230,126,34,.4) !important;opacity:.82}
+.cell-pia .cell-num{color:#A04000}
+.cell-pia .cell-ore{color:#A04000}
+.cell-sel{background:#E74C3C;border-color:#C0392B !important}
+.cell-sel .cell-num{color:#fff}
+#controls{margin:0 12px;display:flex;flex-direction:column;gap:8px}
+.btn-row{display:flex;gap:8px}
+.btn{flex:1;padding:10px 0;border-radius:10px;border:.5px solid #ddd;background:#fff;font-size:13px;font-weight:500;color:#1c1c1e}
+.btn-eff{background:#C0392B !important;color:#fff !important;border-color:#C0392B !important}
+.btn-eff-out{color:#C0392B;border-color:#C0392B !important}
+.btn-pia{background:#E67E22 !important;color:#fff !important;border-color:#E67E22 !important}
+.btn-pia-out{color:#E67E22;border-color:#E67E22 !important}
+.btn-multi{color:#D35400;border-color:#D35400 !important}
+.btn-multi-on{background:#D35400 !important;color:#fff !important;border-color:#D35400 !important}
+.btn-acc{background:#E74C3C !important;color:#fff !important;border-color:#E74C3C !important}
+.btn-del{color:#922B21;border-color:#922B21 !important;flex:none;padding:10px 16px}
+#legend{display:flex;gap:14px;margin-top:4px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:#8e8e93}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+#hint{text-align:center;margin:20px 0 10px;font-size:11px;color:#c7c7cc}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:flex-end;justify-content:center}
+#overlay.open{display:flex}
+.sheet{background:#fff;border-radius:16px 16px 0 0;padding:20px 20px 40px;width:100%;max-width:430px;border-top:.5px solid #e5e5ea}
+.sheet-title{font-size:16px;font-weight:500;color:#1c1c1e;margin-bottom:4px}
+.sheet-sub{font-size:13px;color:#8e8e93;margin-bottom:16px}
+.sheet-label{font-size:12px;color:#8e8e93;margin-bottom:6px}
+.ore-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ore-btn{padding:8px 14px;border-radius:8px;border:.5px solid #ddd;background:#f2f2f7;font-size:14px;font-weight:500;color:#1c1c1e}
+.ore-btn.active{background:#E74C3C;border-color:#E74C3C;color:#fff}
+input[type=number]{width:100%;padding:10px 12px;border-radius:8px;border:.5px solid #ddd;font-size:15px;background:#f2f2f7;color:#1c1c1e;outline:none;margin-bottom:14px;font-family:inherit}
+</style>
+</head>
+<body>
+<div id="header">
+  <div id="header-label">Registro Presenze</div>
+  <div id="month-nav">
+    <button onclick="changeMonth(-1)">&#8249;</button>
+    <span id="month-title"></span>
+    <button onclick="changeMonth(1)">&#8250;</button>
+  </div>
+  <div id="stats">
+    <div class="stat"><div class="stat-label">Effettivi</div><div class="stat-val" id="s-eff">0</div></div>
+    <div class="stat"><div class="stat-label">Ore totali</div><div class="stat-val" id="s-ore">0h</div></div>
+    <div class="stat"><div class="stat-label">Pianificati</div><div class="stat-val" id="s-pia">0</div></div>
+  </div>
+</div>
+<div id="cal-wrap">
+  <div id="day-headers">
+    <div class="dh">L</div><div class="dh">M</div><div class="dh">M</div>
+    <div class="dh">G</div><div class="dh">V</div><div class="dh">S</div><div class="dh">D</div>
+  </div>
+  <div id="cal-grid"></div>
+</div>
+<div id="controls">
+  <div class="btn-row">
+    <button class="btn btn-eff" id="btn-eff" onclick="setMode('effettiva')">&#10003; Effettiva</button>
+    <button class="btn btn-pia-out" id="btn-pia" onclick="setMode('pianificata')">&#9678; Pianificata</button>
+  </div>
+  <button class="btn btn-multi" id="btn-multi" onclick="toggleMulti()">&#9744; Selezione multipla</button>
+  <div class="btn-row" id="multi-actions" style="display:none">
+    <button class="btn btn-acc" onclick="openOreModal()">Segna <span id="sel-count">0</span> giorni</button>
+    <button class="btn btn-del" onclick="removeSelected()">Rimuovi</button>
+  </div>
+  <div id="legend">
+    <div class="leg"><div class="leg-dot" style="background:#C0392B"></div>Effettiva</div>
+    <div class="leg"><div class="leg-dot" style="background:rgba(230,126,34,.25);border:1px solid #E67E22"></div>Pianificata</div>
+    <div class="leg"><div class="leg-dot" style="background:transparent;border:1.5px solid #E74C3C"></div>Oggi</div>
+  </div>
+</div>
+<div id="hint">Aggiungi alla schermata Home per usarla come app</div>
+<div id="overlay" onclick="closeOverlay(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div id="sheet-content"></div>
+  </div>
+</div>
+<script>
+const MONTHS=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+const ORE_OPTS=[4,6,7,8,9,10];
+let data=JSON.parse(localStorage.getItem('presenze_v1')||'{}');
+let now=new Date();
+let curY=now.getFullYear(),curM=now.getMonth();
+let mode='effettiva',multiOn=false,sel=[],pendingKey=null;
+function save(){localStorage.setItem('presenze_v1',JSON.stringify(data));}
+function dateKey(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+function todayKey(){return dateKey(now.getFullYear(),now.getMonth(),now.getDate());}
+function changeMonth(dir){curM+=dir;if(curM<0){curM=11;curY--;}if(curM>11){curM=0;curY++;}render();}
+function setMode(m){mode=m;document.getElementById('btn-eff').className='btn '+(m==='effettiva'?'btn-eff':'btn-eff-out');document.getElementById('btn-pia').className='btn '+(m==='pianificata'?'btn-pia':'btn-pia-out');}
+function toggleMulti(){multiOn=!multiOn;sel=[];var b=document.getElementById('btn-multi');b.className='btn '+(multiOn?'btn-multi-on':'btn-multi');b.textContent=multiOn?'\u2611 Selezione multipla ON':'\u2610 Selezione multipla';document.getElementById('multi-actions').style.display='none';render();}
+function tapDay(k,day){
+  if(multiOn){var i=sel.indexOf(k);if(i>=0)sel.splice(i,1);else sel.push(k);var n=sel.length;document.getElementById('sel-count').textContent=n;document.getElementById('multi-actions').style.display=n>0?'flex':'none';document.getElementById('btn-multi').textContent='\u2611 Multipla \u2014 '+n+' selezionati';renderCal();}
+  else{if(data[k]){openDayModal(k,day);}else{sel=[k];openOreModal();}}
+}
+function openOreModal(){
+  var isMulti=multiOn&&sel.length>1;
+  var label=isMulti?sel.length+' giorni':(function(){var k=sel[0];var p=k.split('-');return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'});})();
+  document.getElementById('sheet-content').innerHTML='<div class="sheet-title">Quante ore?</div><div class="sheet-sub">'+label+' \u2014 '+(mode==='effettiva'?'Effettiva':'Pianificata')+'</div><div class="ore-grid" id="ore-grid">'+ORE_OPTS.map(function(h){return'<button class="ore-btn" onclick="selectOre('+h+')">'+h+'h</button>';}).join('')+'</div><input type="number" id="ore-input" value="8" min="1" max="24" oninput="highlightOre(this.value)"/><div class="btn-row"><button class="btn" onclick="closeOverlay()">Annulla</button><button class="btn btn-acc" onclick="applyOre()">Conferma</button></div>';
+  selectOre(8);document.getElementById('overlay').classList.add('open');
+}
+function selectOre(h){document.getElementById('ore-input').value=h;document.querySelectorAll('.ore-btn').forEach(function(b){b.className='ore-btn'+(parseInt(b.textContent)===h?' active':'');});}
+function highlightOre(v){document.querySelectorAll('.ore-btn').forEach(function(b){b.className='ore-btn'+(b.textContent===v+'h'?' active':'');});}
+function applyOre(){var ore=parseFloat(document.getElementById('ore-input').value)||8;sel.forEach(function(k){data[k]={type:mode,ore:ore};});save();sel=[];multiOn=false;document.getElementById('multi-actions').style.display='none';document.getElementById('btn-multi').className='btn btn-multi';document.getElementById('btn-multi').textContent='\u2610 Selezione multipla';closeOverlay();render();}
+function removeSelected(){sel.forEach(function(k){delete data[k];});save();sel=[];multiOn=false;document.getElementById('multi-actions').style.display='none';document.getElementById('btn-multi').className='btn btn-multi';document.getElementById('btn-multi').textContent='\u2610 Selezione multipla';render();}
+function openDayModal(k,day){
+  var parts=k.split('-');var dateStr=new Date(+parts[0],+parts[1]-1,+parts[2]).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});var p=data[k];pendingKey=k;
+  document.getElementById('sheet-content').innerHTML='<div class="sheet-title">'+dateStr+'</div><div class="sheet-sub">'+(p.type==='effettiva'?'\u2713 Effettiva':'\u25ce Pianificata')+' \u00b7 '+p.ore+'h</div><div class="sheet-label">Tipo</div><div class="btn-row" style="margin-bottom:14px"><button class="btn '+(p.type==='effettiva'?'btn-eff':'btn-eff-out')+'" id="dt-eff" onclick="changeDayType(\'effettiva\')">\u2713 Effettiva</button><button class="btn '+(p.type==='pianificata'?'btn-pia':'btn-pia-out')+'" id="dt-pia" onclick="changeDayType(\'pianificata\')">\u25ce Pianificata</button></div><div class="sheet-label">Ore</div><div class="ore-grid" id="ore-grid-day">'+ORE_OPTS.map(function(h){return'<button class="ore-btn'+(p.ore===h?' active':'')+'" onclick="changeDayOre('+h+')">'+h+'h</button>';}).join('')+'</div><div class="btn-row"><button class="btn" style="color:#922B21;border-color:#922B21" onclick="removeDayModal()">Rimuovi</button><button class="btn btn-acc" style="flex:2" onclick="closeOverlay()">Fatto</button></div>';
+  document.getElementById('overlay').classList.add('open');
+}
+function changeDayType(t){data[pendingKey].type=t;save();document.getElementById('dt-eff').className='btn '+(t==='effettiva'?'btn-eff':'btn-eff-out');document.getElementById('dt-pia').className='btn '+(t==='pianificata'?'btn-pia':'btn-pia-out');renderCal();renderStats();}
+function changeDayOre(h){data[pendingKey].ore=h;save();document.querySelectorAll('#ore-grid-day .ore-btn').forEach(function(b){b.className='ore-btn'+(parseInt(b.textContent)===h?' active':'');});renderStats();}
+function removeDayModal(){delete data[pendingKey];save();closeOverlay();render();}
+function closeOverlay(e){if(!e||e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('open');}
+function renderStats(){var prefix=curY+'-'+String(curM+1).padStart(2,'0');var entries=Object.entries(data).filter(function(e){return e[0].startsWith(prefix);});var eff=entries.filter(function(e){return e[1].type==='effettiva';});var pia=entries.filter(function(e){return e[1].type==='pianificata';});var oreEff=eff.reduce(function(s,e){return s+(e[1].ore||0);},0);document.getElementById('s-eff').textContent=eff.length;document.getElementById('s-ore').textContent=oreEff+'h';document.getElementById('s-pia').textContent=pia.length;document.getElementById('month-title').textContent=MONTHS[curM]+' '+curY;}
+function renderCal(){var tk=todayKey();var firstDow=(new Date(curY,curM,1).getDay()+6)%7;var daysInMonth=new Date(curY,curM+1,0).getDate();var html='';for(var i=0;i<firstDow;i++)html+='<div></div>';for(var d=1;d<=daysInMonth;d++){var k=dateKey(curY,curM,d);var p=data[k];var isSel=sel.indexOf(k)>=0;var isToday=k===tk;var isEff=p&&p.type==='effettiva';var isPia=p&&p.type==='pianificata';var cls='cell';if(isSel)cls+=' cell-sel';else if(isEff)cls+=' cell-eff';else if(isPia)cls+=' cell-pia';if(isToday&&!isSel&&!isEff)cls+=' cell-today';html+='<div class="'+cls+'" onclick="tapDay(\''+k+'\','+d+')"><span class="cell-num">'+d+'</span>'+(p?'<span class="cell-ore">'+p.ore+'h</span>':'')+'</div>';}document.getElementById('cal-grid').innerHTML=html;}
+function render(){renderStats();renderCal();}
+render();
+</script>
+</body>
+</html>
